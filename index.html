@@ -327,7 +327,7 @@ card0btn:function(){var c=qq("#v .card")[0];return c&&c.querySelector(".btn")},l
 function astFind(n){try{if(n.indexOf("h2:")===0){var h=qh("#v h2",new RegExp(n.slice(3)));return h&&(h.closest(".card")||h)}return AF[n]()}catch(e){return null}}
 var astA=null,astT=0,astK="",astEl=null,astRun=0;
 function astSp(on){var b=document.getElementById("ast");if(b)b.classList.toggle("tk",!!on)}
-function astHome(){var b=document.getElementById("ast"),nv=document.querySelector("nav"),nh=(nv&&nv.style.display!=="none")?nv.offsetHeight:0;b.style.transform="translate(8px,"+Math.max(60,innerHeight-nh-118)+"px)"}
+function astHome(){var b=document.getElementById("ast"),nv=document.querySelector("nav"),nh=(nv&&nv.style.display!=="none")?(nv.offsetHeight||76):0;b.style.transform="translate(8px,"+Math.max(60,innerHeight-nh-118)+"px)"}
 function astPlace(el,noscroll){var b=document.getElementById("ast"),rg=document.getElementById("astr");if(!el){astHome();rg.hidden=true;return}
 if(!noscroll){var r0=el.getBoundingClientRect();if(r0.height<innerHeight*.6&&(r0.top<70||r0.bottom>innerHeight-150))el.scrollIntoView({block:"center"});else if(r0.height>=innerHeight*.6&&(r0.top<70||r0.top>innerHeight-200))window.scrollBy(0,r0.top-110)}
 var r=el.getBoundingClientRect(),W=innerWidth,H=innerHeight,nv=document.querySelector("nav"),nh=(nv&&nv.style.display!=="none")?nv.offsetHeight:0,cw=92,ch=88;
@@ -348,7 +348,7 @@ astTts()}
 function astToggle(){if(document.getElementById("ast").classList.contains("gd"))astStop();else astPlay(astKey())}
 document.addEventListener("click",function(e){if(document.getElementById("ast").classList.contains("gd")&&!e.target.closest("#ast"))astStop()},true);
 window.addEventListener("resize",function(){if(astEl)astPlace(astEl,true);else astHome()});window.addEventListener("scroll",function(){if(astEl)astPlace(astEl,true)},true);
-astHome();
+astHome();setInterval(function(){if(!document.getElementById("ast").classList.contains("gd"))astHome()},1200);
 draw();
 </script>
 <script>if('serviceWorker' in navigator&&location.protocol.indexOf('http')==0){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
