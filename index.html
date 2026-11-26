@@ -86,11 +86,20 @@ nav button.on{background:var(--g);color:var(--on)}
 @keyframes fall{from{transform:translateY(-10vh) rotate(0)}to{transform:translateY(115vh) rotate(540deg)}}
 @media (prefers-reduced-motion:reduce){#cel i{animation:none;display:none}}
 nav button{font-size:15px;padding:0 2px}
+
+#ast{position:fixed;left:12px;bottom:calc(88px + env(safe-area-inset-bottom,0px));width:66px;height:66px;border-radius:33px;border:0;background:var(--a);color:#1F2A24;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:13px;font-weight:900;box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:45;cursor:pointer;font-family:inherit}
+#astp{position:fixed;left:12px;bottom:calc(164px + env(safe-area-inset-bottom,0px));width:min(320px,calc(100vw - 40px));background:var(--card);border:3px solid var(--a);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;z-index:46;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+#astp[hidden]{display:none}
+#astp .t{font-size:19px;font-weight:700;line-height:1.8}
+#astp .row2{display:flex;gap:8px}
+#astp button{min-height:46px;border-radius:14px}
 </style>
 </head>
 <body>
 <div id="app"><header id="hd"></header><main id="v"></main></div>
 <nav><div id="nav"></div></nav>
+<button id="ast" aria-label="المساعد: اشرحلي أنا واقف على إيه" onclick="astToggle()"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.2-1.1L3 20l1.1-5.3A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.5 10.5v2M12 8.5v5M15.5 10.5v2"/></svg><span>ساعدني</span></button>
+<div id="astp" hidden><div class="t" id="astx"></div><div class="row2"><button class="btn alt" style="flex:1;font-size:16px" onclick="astSay()">اسمع تاني</button><button class="btn amb" style="flex:1;font-size:16px" onclick="astClose()">تمام، فهمت</button></div></div>
 <script>
 var D=[["لافتة","خروج|مدخل|مستشفى|محطة|شارع|مدرسة|سوق|ممنوع|دخول|انتظار|إسعاف|بوابة|اتجاه|موقف|قسم|طوارئ"],["فاتورة","جنيه|سعر|خصم|الباقي|مئة جنيه|خمسين جنيه|إيصال|دفع|عشرة جنيه|عشرين جنيه|حساب|كاش|إجمالي|رصيد|فيزا|فكة"],["علبة دوا","مسكّن|صيدلية|قبل الأكل|بعد الأكل|مرة يومياً|مرتين يومياً|قرص|تاريخ الانتهاء|روشتة|جرعة|شراب|مضاد حيوي|دكتور|تحليل|موعد|كشف"],["رسالة واتساب","صباح الخير|شكراً|تعال بكرة|مبروك|مساء الخير|إن شاء الله|كل سنة وانت طيب|وصلت بالسلامة|ازيك|وحشتني|متأخرش|كلمني|فينك|تمام|ماشي|مع السلامة"],["ورقة رسمية","الاسم|العنوان|التوقيع|تاريخ الميلاد|رقم الهاتف|الرقم القومي|الوظيفة|الحالة الاجتماعية|بطاقة|بيانات|شهادة الميلاد|طلب|ختم|قسيمة|محضر|صورة البطاقة"]];
 var NUMC=["أرقام ووقت","واحد|اتنين|تلاتة|أربعة|خمسة|ستة|سبعة|تمانية|تسعة|عشرة|عشرين|مية|ألف|الساعة|التاريخ|السنة"];
@@ -266,6 +275,19 @@ function draw(){document.getElementById("app").style.zoom=S.z;document.getElemen
 var gate=!!S.pt;v.innerHTML=gate?ptv():S.mq?mqv():S.cur!==null?lesson():t==="lt"?(S.lc!==null?letterv():lettersv()):t==="home"?(S.cat!==null?catv():home()):t==="pr"?prv():t==="trip"?journey():t==="fam"?famv():setv();
 document.getElementById("nav").innerHTML=[["home","النهاردة"],["lt","حروف"],["pr","تدرّب"],["trip","رحلتي"],["fam","العيلة"]].map(function(x){return '<button class="'+(t===x[0]&&S.cur===null?'on':'')+'" onclick="tab(\''+x[0]+'\')">'+x[1]+'</button>'}).join("");
 document.querySelector("nav").style.display=gate?"none":"";if(!gate)addSp();if(!gate&&!S.mq&&(S.cur!==null||S.lc!==null))pad();var oc=document.getElementById("cel");if(oc)oc.remove();if(S.cel&&!gate)document.body.insertAdjacentHTML("beforeend",celv())}
+function astText(){var nm=S.name?" يا "+S.name:"";
+if(S.pt){var p=S.pt;if(p.res)return "خلصت الاختبار الصغير وجبت "+p.s+" من "+p.q.length+". "+(p.s>=4?"مستواك كويس، هنكمّل من الكلمات على طول.":"هنبدأ من الحروف الأول عشان تتأسس صح.")+" دوس تمام عشان تبدأ.";return "انت في اختبار صغير من خمس أسئلة عشان نعرف نبدأ معاك منين. في كل سؤال دوس على زرار اسمع، وبعدين اختار الحرف أو الكلمة اللي سمعتها. متقلقش، مفيش درجات ولا حد هيعرف."}
+if(S.mq){var m=S.mq;if(m.done)return "خلصت كويز حرف "+LT[m.i][1]+" وجبت "+m.s+" من "+m.q.length+". دوس الحرف اللي بعده عشان تكمّل، أو ارجع للحرف لو حابب تتمرّن تاني.";return "انت في كويز حرف "+LT[m.i][1]+". دوس اسمع الحرف، وبعدين اختار شكله من الزراير اللي تحت. لو غلطت، جرّب تاني عادي."}
+if(S.cur!==null){var wn=S.cur==="name",w=wn?S.name:W[S.cur][0],c=wn?"اسمك":W[S.cur][1];return (wn?"انت في صفحة اسمك: "+w+". دوس اسمعها تسمعه، وامشي بصباعك عليه في اللوح، ولما تخلص دوس خلصت.":"انت في صفحة كلمة "+w+" من "+c+". دوس اسمعها عشان تسمعها، أو اهجّيها عشان تسمعها حرف حرف. وتحت دوس على أي حرف تسمع اسمه، وامشي بصباعك على الكلمة في اللوح. لما تخلص دوس خلصت تكسب نجمة.")}
+if(S.tab==="lt"){if(S.lc!==null){var L=LT[S.lc];return "انت في صفحة حرف "+L[1]+". فوق فيه فيديو بيشرح الحرف، والفيديو محتاج نت. دوس اسمعه عشان تسمع اسمه، وتحت هتلاقي أشكاله أول ووسط وآخر الكلمة، دوس على أي شكل وامشي بصباعك عليه في اللوح. لما تبقى جاهز دوس امتحن على حرف "+L[1]+"."}return "دي صفحة الحروف، فيها تمانية وعشرين حرف. دوس على أي حرف تسمع اسمه وتفتح صفحته. والحرف اللي عليه علامة صح يبقى انت خلصته."}
+if(S.tab==="home"){if(S.cat!==null){var cc=S.cat;return "انت في مجموعة "+CATS[cc]+". فيها "+catLen(cc)+" كلمة، وخلصت منهم "+cnt(cc)+". دوس على أي كلمة تفتح صفحتها وتسمعها وتتمرّن عليها."}return "دي الصفحة الرئيسية"+nm+". فوق هتلاقي نجومك وتقدمك، وزرار كمّل بيرجّعك لآخر حاجة وقفت عندها. تحت فيه كاميرا تصوّر بيها أي لافتة أو ورقة وأنا أقراها لك، وبعدها مراحلك ومجموعات الكلمات. ولو كتبت اسمك تحت، هتتمرّن عليه."}
+if(S.tab==="pr"){if(S.sub==="hear")return "انت في تدريب السمع. دوس اسمع الكلمة، وبعدين اختارها من الاختيارات اللي تحت. لو غلطت، هنرجّعلك الكلمة تاني لحد ما تثبت.";if(S.sub==="build")return "انت في تدريب التركيب. دوس اسمع الكلمة، وبعدين رتّب حروفها بالدوس عليها واحد واحد. لو لخبطت دوس امسح وابدا من الأول.";if(S.sub==="let")return "انت في تدريب الحروف. دوس اسمع الحرف، وبعدين اختار شكله من الزراير اللي تحت.";var s=ST[S.sidx];return "انت في صفحة القصص، والقصة المفتوحة اسمها "+s[0]+". دوس على أي كلمة تسمعها لوحدها، أو دوس اسمع القصة كلها أقراها لك. لما تخلص قراية دوس قريتها."}
+if(S.tab==="trip")return "دي صفحة رحلتك. بتشوف فيها مستواك، وكل خطوة خلصتها، وفاضل إيه على شهادة محو الأمية. كل نجمة بتجمعها بتقرّبك من المستوى اللي بعده.";
+if(S.tab==="fam")return "دي صفحة العيلة. حد من بيتك يكتب هنا كلمة أو جملة، فتظهر لك في الصفحة الرئيسية كتحدي منه. وتحت فيه تقرير بتقدمك، يقدر ينسخه أو يبعته واتساب لحد يتابعك.";
+return "دي صفحة الإعدادات. من هنا تختار الصوت وسرعته، وحجم الكتابة، وهدف النهاردة. والأهم: من هنا تنزّل نسخة احتياطية من تقدمك كل فترة، ولو حاجة اتمسحت ترجّعها من نفس المكان."}
+function astSay(){say(document.getElementById("astx").textContent)}
+function astToggle(){var p=document.getElementById("astp");if(p.hidden){var t=astText();document.getElementById("astx").textContent=t;p.hidden=false;say(t)}else{try{speechSynthesis.cancel()}catch(e){}p.hidden=true}}
+function astClose(){try{speechSynthesis.cancel()}catch(e){}document.getElementById("astp").hidden=true}
 draw();
 </script>
 <script>if('serviceWorker' in navigator&&location.protocol.indexOf('http')==0){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
